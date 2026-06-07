@@ -1,4 +1,4 @@
-name: Build Test
+name: Deploy SpringBoot
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     defaults:
@@ -25,3 +25,22 @@ jobs:
 
       - name: Build
         run: mvn clean package -DskipTests
+
+      - name: Upload Jar
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.ECS_HOST }}
+          username: ${{ secrets.ECS_USER }}
+          key: ${{ secrets.ECS_SSH_KEY }}
+          source: "backend/target/secondhand-1.0.0.jar"
+          target: "/opt/warehouse"
+
+      - name: Restart App
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.ECS_HOST }}
+          username: ${{ secrets.ECS_USER }}
+          key: ${{ secrets.ECS_SSH_KEY }}
+          script: |
+            pkill -f secondhand || true
+            nohup java -jar /opt/warehouse/backend/target/secondhand-1.0.0.jar > /opt/warehouse/app.log 2>&1 &
