@@ -1,0 +1,23 @@
+# 前端
+node_modules/
+dist/
+.env
+
+# 后端（Java/Spring Boot）
+target/
+*.class
+*.jar
+*.war
+.env
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+backend/uploads/*
+!backend/uploads/.gitkeep
